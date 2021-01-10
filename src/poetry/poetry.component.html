@@ -1,0 +1,51 @@
+<div class="container container-shadow">
+  <div class="filter-container container-shadow">
+    <form class="poetry-form">
+      <mat-form-field>
+        <mat-label>Author</mat-label>
+        <input id="author" matInput placeholder="Pick Author" [formControl]="authorControl"
+          [matAutocomplete]="authorList" (blur)='getOption("author", input.value)' #input>
+        <mat-autocomplete #authorList="matAutocomplete">
+          <mat-option *ngFor="let option of filteredAuthOptions | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+
+      <mat-form-field>
+        <mat-label>Title</mat-label>
+        <input id="title" matInput id="title" placeholder="Pick Title" [formControl]="titleControl" [matAutocomplete]="title"
+          (blur)='getOption("title", titleInput.value)' #titleInput>
+        <mat-autocomplete autoActiveFirstOption #title="matAutocomplete">
+          <mat-option *ngFor="let option of filteredTitleOptions | async" [value]="option.title">
+            {{option.title}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
+
+    <div class="example-button-row">
+      <button id="search" mat-raised-button color="primary" (click)="getPoetry($event)"
+        [disabled]="selectedAuthore === '' || selectedTitle===''">Search</button>
+    </div>
+  </div>
+  <div class="poetry-container container-shadow">
+    <div *ngFor="let poet of poetry">
+      <div *ngIf="!rhymNotAvailable">
+        <div class="poetry-heading">
+          <div class="poetry-heading-scheme">Rhyme scheme: {{poet.rhymScheme}}</div>
+          <div class="poetry-heading-title">{{poet.title}}</div>
+          <div class="poetry-heading-author">{{poet.author}}</div>
+        </div>
+        <div class="poetry-text">
+          <span>{{poet.rhym}}</span>
+        </div>
+      </div>
+      <hr>
+    </div>
+    <div *ngIf="rhymNotAvailable" class="poetry-heading-scheme">
+      Rhyme Not Available
+    </div>
+  </div>
+</div>
