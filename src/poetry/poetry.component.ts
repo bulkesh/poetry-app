@@ -168,7 +168,7 @@ export class PoetryComponent implements OnInit, OnDestroy {
               this.filterTitleOptions();
             }
             this.cdr.detectChanges();
-            
+
             break;
           case 'poetry':
             const poet = response as unknown as Poetry[];
@@ -181,7 +181,7 @@ export class PoetryComponent implements OnInit, OnDestroy {
               for (let i in this.poetry) {
                 this.poetry[i].rhym = this.poetry[i].lines.join('\r\n');
                 this.detectRhymeCouplet(this.poetry[i])
-               
+
               }
             };
             break;
@@ -204,14 +204,53 @@ export class PoetryComponent implements OnInit, OnDestroy {
   /**
    * This method is detecting “AA BB” couplet rhyme scheme 
    */
-  detectRhymeCouplet(poetry:Poetry) {
+  detectRhymeCouplet(poetry: Poetry) {
+    poetry.rhymScheme = 'Not Found';
+    const wordsArray = poetry.lines.map(this.getEnding);
+    let a1 = 0;
+    let a2 = 1;
+    let b1 = 2;
+    let b2 = 3;
+    let increaseIndexBy = 4;
 
-    console.log("poetry : ",poetry.lines);
-   // poetry.rhymScheme = 'Not Found';
-   console.log(poetry.lines.map(this.getEnding));
+    for (let i = 0; i < wordsArray.length; i++) {
+      if ((wordsArray[a2] === wordsArray[a1]) || wordsArray[a1].includes(wordsArray[a2]) || wordsArray[a2].includes(wordsArray[a1])) {
+        if ((wordsArray[b2] === wordsArray[b1]) || wordsArray[b1].includes(wordsArray[b2]) || wordsArray[b2].includes(wordsArray[b1])) {
+          poetry.rhymScheme = 'Rhyme scheme: AA BB';
+          break;
+        } else {
+          // b2 index value should be less then array length.
+          if (b2 + increaseIndexBy < wordsArray.length) {
+            // If a1 index value in array is "blank", then take next index value.
+            if (wordsArray[a1 + increaseIndexBy] === '') {
+              increaseIndexBy += 1;
+            }
+            a1 += increaseIndexBy;
+            a2 += increaseIndexBy;
+            b1 += increaseIndexBy;
+            b2 += increaseIndexBy;
+          }
+        }
+      } else {
+        if (b2 + increaseIndexBy < wordsArray.length) {
+          if (wordsArray[a1 + increaseIndexBy] === '') {
+            increaseIndexBy += 1;
+          }
+          a1 += increaseIndexBy;
+          a2 += increaseIndexBy;
+          b1 += increaseIndexBy;
+          b2 += increaseIndexBy;
+        }
+
+      }
+    }
   }
 
-  getEnding(word:string) {
-    return (word.match(/[aeiou]*[aeiouy]$|[aeiou]+[^aeiou]+$/) || [''])[0];
-}
+  getEnding(word: string, index: number) {
+    // getting sub string from the last word of the line - vowels followed by a vowel or y.
+    let str = (word.match(/[aeiou]*[aeiouy]$|[aeiou]+[^aeiou]+$/) || [''])[0];
+    // Removing special character from the end of the substring.
+    let modifiedStr = str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+    return modifiedStr;
+  }
 }
