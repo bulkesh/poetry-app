@@ -6,7 +6,7 @@ import { HttpDataServiceService } from '../services/http_data_service.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { Authors, Title, Poetry } from '../utils/interface';
+import { Authors, Title, Poetry, Data } from '../utils/interface';
 
 const POET_BASE_API_URL = 'https://poetrydb.org/author';
 
@@ -145,22 +145,24 @@ export class PoetryComponent implements OnInit, OnDestroy {
   * Api call for Author, title and poetry.
   * and based on callFor catagory api response will be assigned to respective variables.
  */
-  fetchApiData<T>(apiUrl: string, callFor: string): void {
+  fetchApiData(apiUrl: string, callFor: string): void {
 
-    this.httpService.getData<T>(apiUrl)
+    this.httpService.getData(apiUrl)
       .pipe(takeUntil(this.destroyed))
-      .subscribe((response: T[]) => {
+      .subscribe(response => {
         if (!response) return;
+        const responseBody = response.body as unknown;
         switch (callFor) {
           case 'author':
             this.titleOptions = [];
             this.titleControl.setValue('');
-            const res = response as unknown as Authors;
+            const res = responseBody as Authors;
             this.authorOptions = res.authors;
             this.filterAuthorOptions();
             break;
           case 'title':
-            const title = response as unknown as Title[];
+            const title = responseBody as Title[];
+            
             if (!title || !title.length || title.length < 1) {
               this.titleOptions = [];
             } else {
@@ -171,7 +173,7 @@ export class PoetryComponent implements OnInit, OnDestroy {
 
             break;
           case 'poetry':
-            const poet = response as unknown as Poetry[];
+            const poet = responseBody as Poetry[];
             this.poetry = [];
             if (!poet || !poet.length || poet.length < 1) {
               this.rhymNotAvailable = true;

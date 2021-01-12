@@ -33,11 +33,7 @@ declare interface Poetry {
     'lines': string[];
     'rhym'?: string;
     'rhymScheme'?:string;
-    'status'?: number, 
-    'reason'?: string,
 }
-
-
 
 export {
     Data,
